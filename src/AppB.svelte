@@ -24,6 +24,22 @@
     }
   }
 
+  // const WINNING_PLAYS = [
+  //   14, 0, 18, 1, 22, 10, 26, 9, 11, 26, 15, 22, 19, 18, 23, 3, 1, 23, 0, 19, 3,
+  //   7, 12, 0, 16, 5, 20, 1, 24, 15, 1, 24, 0, 20, 5, 0, 7, 1, 9, 16, 13, 7, 17,
+  //   12, 21, 11, 7, 5, 25, 14, 10, 25, 5, 21, 1, 17, 0, 13,
+  // ];
+  // async function delay(ms) {
+  //   return new Promise((r) => setTimeout(r, ms));
+  // }
+  // async function run() {
+  //   for (let nodeIdx of WINNING_PLAYS) {
+  //     selectNode(nodeIdx);
+  //     await delay(1000);
+  //   }
+  // }
+  // run();
+
   function undo() {
     let drops = plays.length % 2 == 0 ? 2 : 1;
     let newPlays = plays.slice(0, -1 * drops);
@@ -117,7 +133,7 @@
   }
 
   function makeNodes() {
-    let nodes = range(19).map((idx) => {
+    let nodes = range(27).map((idx) => {
       return {
         idx,
         neighbors: [],
@@ -140,19 +156,40 @@
     nodes[12].neighbors = [nodes[4], nodes[16]];
     nodes[13].neighbors = [nodes[6], nodes[17]];
     nodes[14].neighbors = [nodes[8], nodes[18]];
-    nodes[15].neighbors = [nodes[11]];
-    nodes[16].neighbors = [nodes[12]];
-    nodes[17].neighbors = [nodes[13]];
-    nodes[18].neighbors = [nodes[14]];
+    nodes[15].neighbors = [nodes[11], nodes[19]];
+    nodes[16].neighbors = [nodes[12], nodes[20]];
+    nodes[17].neighbors = [nodes[13], nodes[21]];
+    nodes[18].neighbors = [nodes[14], nodes[22]];
+
+    nodes[19].neighbors = [nodes[15], nodes[23]];
+    nodes[20].neighbors = [nodes[16], nodes[24]];
+    nodes[21].neighbors = [nodes[17], nodes[25]];
+    nodes[22].neighbors = [nodes[18], nodes[26]];
+
+    nodes[23].neighbors = [nodes[19]];
+    nodes[24].neighbors = [nodes[20]];
+    nodes[25].neighbors = [nodes[21]];
+    nodes[26].neighbors = [nodes[22]];
 
     nodes[11].allowed = ["A"];
     nodes[15].allowed = ["A"];
+    nodes[19].allowed = ["A"];
+    nodes[23].allowed = ["A"];
+
     nodes[12].allowed = ["B"];
     nodes[16].allowed = ["B"];
+    nodes[20].allowed = ["B"];
+    nodes[24].allowed = ["B"];
+
     nodes[13].allowed = ["C"];
     nodes[17].allowed = ["C"];
+    nodes[21].allowed = ["C"];
+    nodes[25].allowed = ["C"];
+
     nodes[14].allowed = ["D"];
     nodes[18].allowed = ["D"];
+    nodes[22].allowed = ["D"];
+    nodes[26].allowed = ["D"];
 
     // cannot stop at top of a hallway
     nodes[2].allowed = [];
@@ -162,23 +199,46 @@
 
     // occupants -- my input
     nodes[11].occupant = "D";
-    nodes[15].occupant = "C";
     nodes[12].occupant = "B";
-    nodes[16].occupant = "A";
     nodes[13].occupant = "C";
-    nodes[17].occupant = "D";
     nodes[14].occupant = "A";
-    nodes[18].occupant = "B";
+
+    nodes[15].occupant = "D";
+    nodes[16].occupant = "C";
+    nodes[17].occupant = "B";
+    nodes[18].occupant = "A";
+
+    nodes[19].occupant = "D";
+    nodes[20].occupant = "B";
+    nodes[21].occupant = "A";
+    nodes[22].occupant = "C";
+
+    nodes[23].occupant = "C";
+    nodes[24].occupant = "A";
+    nodes[25].occupant = "D";
+    nodes[26].occupant = "B";
 
     // occupants -- example
     // nodes[11].occupant = "B";
-    // nodes[15].occupant = "A";
     // nodes[12].occupant = "C";
-    // nodes[16].occupant = "D";
     // nodes[13].occupant = "B";
-    // nodes[17].occupant = "C";
     // nodes[14].occupant = "D";
+
+    // nodes[15].occupant = "D";
+    // nodes[16].occupant = "C";
+    // nodes[17].occupant = "B";
     // nodes[18].occupant = "A";
+
+    // nodes[19].occupant = "D";
+    // nodes[20].occupant = "B";
+    // nodes[21].occupant = "A";
+    // nodes[22].occupant = "C";
+
+    // nodes[23].occupant = "A";
+    // nodes[24].occupant = "D";
+    // nodes[25].occupant = "C";
+    // nodes[26].occupant = "A";
+
     return nodes;
   }
 
@@ -187,6 +247,8 @@
 #...........# -- 0  1   2   3  4   5   6   7  8  9  10
 ###D#B#C#A### .         11     12      13     14
   #C#A#D#B#             15     16      17     18
+  #C#A#D#B#             19     20      21     22
+  #C#A#D#B#             23     24      25     26
   #########
 
 #############
@@ -256,20 +318,108 @@
         <div class="space">&nbsp;</div>
       {/each}
       <div class="wall">#</div>
-      <div class="node" on:click={() => selectNode(15)}>
+      <div
+        class="node {selectedIdx == 15 ? 'selected' : ''}"
+        on:click={() => selectNode(15)}
+      >
         {nodes[15].occupant || "."}
       </div>
       <div class="wall">#</div>
-      <div class="node" on:click={() => selectNode(16)}>
+      <div
+        class="node {selectedIdx == 16 ? 'selected' : ''}"
+        on:click={() => selectNode(16)}
+      >
         {nodes[16].occupant || "."}
       </div>
       <div class="wall">#</div>
-      <div class="node" on:click={() => selectNode(17)}>
+      <div
+        class="node {selectedIdx == 17 ? 'selected' : ''}"
+        on:click={() => selectNode(17)}
+      >
         {nodes[17].occupant || "."}
       </div>
       <div class="wall">#</div>
-      <div class="node" on:click={() => selectNode(18)}>
+      <div
+        class="node {selectedIdx == 18 ? 'selected' : ''}"
+        on:click={() => selectNode(18)}
+      >
         {nodes[18].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      {#each range(2) as i}
+        <div class="space">&nbsp;</div>
+      {/each}
+    </div>
+    <!--- 1st extra -->
+    <div class="row">
+      {#each range(2) as i}
+        <div class="space">&nbsp;</div>
+      {/each}
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 19 ? 'selected' : ''}"
+        on:click={() => selectNode(19)}
+      >
+        {nodes[19].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 20 ? 'selected' : ''}"
+        on:click={() => selectNode(20)}
+      >
+        {nodes[20].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 21 ? 'selected' : ''}"
+        on:click={() => selectNode(21)}
+      >
+        {nodes[21].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 22 ? 'selected' : ''}"
+        on:click={() => selectNode(22)}
+      >
+        {nodes[22].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      {#each range(2) as i}
+        <div class="space">&nbsp;</div>
+      {/each}
+    </div>
+    <!--- 2nd extra -->
+    <div class="row">
+      {#each range(2) as i}
+        <div class="space">&nbsp;</div>
+      {/each}
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 23 ? 'selected' : ''}"
+        on:click={() => selectNode(23)}
+      >
+        {nodes[23].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 24 ? 'selected' : ''}"
+        on:click={() => selectNode(24)}
+      >
+        {nodes[24].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 25 ? 'selected' : ''}"
+        on:click={() => selectNode(25)}
+      >
+        {nodes[25].occupant || "."}
+      </div>
+      <div class="wall">#</div>
+      <div
+        class="node {selectedIdx == 26 ? 'selected' : ''}"
+        on:click={() => selectNode(26)}
+      >
+        {nodes[26].occupant || "."}
       </div>
       <div class="wall">#</div>
       {#each range(2) as i}
