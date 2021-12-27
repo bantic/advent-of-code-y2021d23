@@ -1,3 +1,10 @@
+# Advent of Code 2021 Day 23
+
+See https://adventofcode.com/2021/day/23
+
+![image](https://user-images.githubusercontent.com/2023/147451267-c059dd82-0992-4862-a0e3-517d81312e35.png)
+
+
 *Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing.*
 
 *Looking for a shareable component template instead? You can [use SvelteKit for that as well](https://kit.svelte.dev/docs#packaging) or the older [sveltejs/component-template](https://github.com/sveltejs/component-template)*
