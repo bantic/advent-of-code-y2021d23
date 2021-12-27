@@ -24,21 +24,34 @@
     }
   }
 
+  // 47064
+  const WINNING_PLAYS = [
+    14, 0, 18, 1, 22, 10, 26, 9, 11, 26, 15, 22, 19, 18, 23, 7, 1, 23, 0, 19,
+    13, 0, 17, 1, 21, 15, 25, 5, 7, 25, 5, 14, 12, 7, 16, 21, 20, 5, 24, 11, 5,
+    24, 7, 20, 9, 16, 1, 12, 0, 17, 10, 13,
+  ];
+
+  // 47066
+  // const WINNING_PLAYS = [
+  //   14, 0, 18, 1, 22, 10, 26, 9, 11, 26, 15, 22, 19, 18, 23, 7, 1, 23, 0, 19,
+  //   13, 0, 17, 1, 21, 15, 25, 5, 7, 25, 5, 14, 12, 3, 16, 21, 20, 7, 24, 5, 3,
+  //   24, 5, 11, 7, 20, 9, 16, 1, 12, 0, 17, 10, 13,
+  // ];
   // const WINNING_PLAYS = [
   //   14, 0, 18, 1, 22, 10, 26, 9, 11, 26, 15, 22, 19, 18, 23, 3, 1, 23, 0, 19, 3,
   //   7, 12, 0, 16, 5, 20, 1, 24, 15, 1, 24, 0, 20, 5, 0, 7, 1, 9, 16, 13, 7, 17,
   //   12, 21, 11, 7, 5, 25, 14, 10, 25, 5, 21, 1, 17, 0, 13,
   // ];
-  // async function delay(ms) {
-  //   return new Promise((r) => setTimeout(r, ms));
-  // }
-  // async function run() {
-  //   for (let nodeIdx of WINNING_PLAYS) {
-  //     selectNode(nodeIdx);
-  //     await delay(1000);
-  //   }
-  // }
-  // run();
+  async function delay(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+  async function run() {
+    for (let nodeIdx of WINNING_PLAYS) {
+      selectNode(nodeIdx);
+      await delay(1000);
+    }
+  }
+  run();
 
   function undo() {
     let drops = plays.length % 2 == 0 ? 2 : 1;
@@ -61,6 +74,16 @@
     if (selectedIdx === null) {
       return false;
     }
+    let start = nodes[selectedIdx];
+    let end = nodes[nodeIdx];
+    let isHallway = (node) => node.allowed.length === 4;
+    let isRoom = (node) => node.allowed.length === 1;
+    if (isHallway(start) && !isRoom(end)) {
+      console.log(`Cannot from hallway->hallway`);
+      return false;
+    }
+
+    // can only move from room->hallway or hallway->room
     return canMoveFromNodeToNode(selectedIdx, nodeIdx);
   }
 
@@ -71,13 +94,20 @@
     } else {
       let start = nodes[selectedIdx];
       let end = nodes[nodeIdx];
-      end.occupant = start.occupant;
+      let occupant = start.occupant;
+      end.occupant = occupant;
       start.occupant = null;
+
+      let moveCost = COSTS[occupant] * path.length;
+      console.log(
+        `moving ${occupant} from ${selectedIdx} -> ${nodeIdx}. ${path.length}*${
+          COSTS[end.occupant]
+        } = ${moveCost}`
+      );
       selectedIdx = null;
-      totalCost += COSTS[end.occupant] * path.length;
+      totalCost += moveCost;
       nodes = nodes; // trigger update
     }
-    console.log(`moving from ${selectedIdx} -> ${nodeIdx}`);
     selectedIdx = null;
   }
 
@@ -132,7 +162,7 @@
       .map((_, idx) => idx);
   }
 
-  function makeNodes() {
+  function makeNodes(example = false) {
     let nodes = range(27).map((idx) => {
       return {
         idx,
@@ -198,46 +228,48 @@
     nodes[8].allowed = [];
 
     // occupants -- my input
-    nodes[11].occupant = "D";
-    nodes[12].occupant = "B";
-    nodes[13].occupant = "C";
-    nodes[14].occupant = "A";
+    if (example) {
+      // occupants -- example
+      nodes[11].occupant = "B";
+      nodes[12].occupant = "C";
+      nodes[13].occupant = "B";
+      nodes[14].occupant = "D";
 
-    nodes[15].occupant = "D";
-    nodes[16].occupant = "C";
-    nodes[17].occupant = "B";
-    nodes[18].occupant = "A";
+      nodes[15].occupant = "D";
+      nodes[16].occupant = "C";
+      nodes[17].occupant = "B";
+      nodes[18].occupant = "A";
 
-    nodes[19].occupant = "D";
-    nodes[20].occupant = "B";
-    nodes[21].occupant = "A";
-    nodes[22].occupant = "C";
+      nodes[19].occupant = "D";
+      nodes[20].occupant = "B";
+      nodes[21].occupant = "A";
+      nodes[22].occupant = "C";
 
-    nodes[23].occupant = "C";
-    nodes[24].occupant = "A";
-    nodes[25].occupant = "D";
-    nodes[26].occupant = "B";
+      nodes[23].occupant = "A";
+      nodes[24].occupant = "D";
+      nodes[25].occupant = "C";
+      nodes[26].occupant = "A";
+    } else {
+      nodes[11].occupant = "D";
+      nodes[12].occupant = "B";
+      nodes[13].occupant = "C";
+      nodes[14].occupant = "A";
 
-    // occupants -- example
-    // nodes[11].occupant = "B";
-    // nodes[12].occupant = "C";
-    // nodes[13].occupant = "B";
-    // nodes[14].occupant = "D";
+      nodes[15].occupant = "D";
+      nodes[16].occupant = "C";
+      nodes[17].occupant = "B";
+      nodes[18].occupant = "A";
 
-    // nodes[15].occupant = "D";
-    // nodes[16].occupant = "C";
-    // nodes[17].occupant = "B";
-    // nodes[18].occupant = "A";
+      nodes[19].occupant = "D";
+      nodes[20].occupant = "B";
+      nodes[21].occupant = "A";
+      nodes[22].occupant = "C";
 
-    // nodes[19].occupant = "D";
-    // nodes[20].occupant = "B";
-    // nodes[21].occupant = "A";
-    // nodes[22].occupant = "C";
-
-    // nodes[23].occupant = "A";
-    // nodes[24].occupant = "D";
-    // nodes[25].occupant = "C";
-    // nodes[26].occupant = "A";
+      nodes[23].occupant = "C";
+      nodes[24].occupant = "A";
+      nodes[25].occupant = "D";
+      nodes[26].occupant = "B";
+    }
 
     return nodes;
   }
