@@ -51,7 +51,8 @@
       await delay(1000);
     }
   }
-  run();
+  // Skip auto-run
+  // run();
 
   function undo() {
     let drops = plays.length % 2 == 0 ? 2 : 1;
